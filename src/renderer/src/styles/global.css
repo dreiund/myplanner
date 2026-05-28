@@ -1,0 +1,48 @@
+/* === MyPlanner Global Baseline ===
+   Sets the typographic foundation. Tokens come from tokens.css. */
+
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #app {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--app-font-text);
+  font-size: var(--app-fs-body);
+  font-weight: var(--app-fw-regular);
+  line-height: var(--app-lh-body);
+  letter-spacing: var(--app-ls-body);
+  color: var(--app-ink);
+  background: var(--app-parchment);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Utility: Apple-style section heading */
+.app-section-heading {
+  font-family: var(--app-font-display);
+  font-size: var(--app-fs-tagline);
+  font-weight: var(--app-fw-semibold);
+  line-height: 1.19;
+  color: var(--app-ink);
+}
+
+/* Utility: Apple-style page title */
+.app-page-title {
+  font-family: var(--app-font-display);
+  font-size: var(--app-fs-hero);
+  font-weight: var(--app-fw-semibold);
+  line-height: var(--app-lh-tight);
+  letter-spacing: var(--app-ls-display);
+  color: var(--app-ink);
+}

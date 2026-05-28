@@ -1,0 +1,81 @@
+<h2>Design Token → CSS Variable Mapping</h2>
+<p class="subtitle">tokens.css is the single source of truth. All DESIGN.md values become --app-* CSS custom properties.</p>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">Color Tokens</div>
+    <div class="mockup-body">
+      <table style="width:100%;font-size:13px;border-collapse:collapse;font-family:system-ui;">
+        <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:6px 8px;color:#7a7a7a;">DESIGN.md</td><td style="padding:6px 8px;color:#7a7a7a;">CSS Variable</td><td style="padding:6px 8px;text-align:right;color:#7a7a7a;">Value</td></tr>
+        <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:6px 8px;font-weight:600;">primary</td><td style="padding:6px 8px;font-family:monospace;font-size:12px;">--app-blue</td><td style="padding:6px 8px;text-align:right;"><span style="background:#0066cc;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">#0066cc</span></td></tr>
+        <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:6px 8px;font-weight:600;">ink</td><td style="padding:6px 8px;font-family:monospace;font-size:12px;">--app-ink</td><td style="padding:6px 8px;text-align:right;"><span style="background:#1d1d1f;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">#1d1d1f</span></td></tr>
+        <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:6px 8px;font-weight:600;">canvas</td><td style="padding:6px 8px;font-family:monospace;font-size:12px;">--app-canvas</td><td style="padding:6px 8px;text-align:right;"><span style="background:#fff;color:#1d1d1f;border:1px solid #e0e0e0;padding:2px 8px;border-radius:4px;font-size:11px;">#ffffff</span></td></tr>
+        <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:6px 8px;font-weight:600;">canvas-parchment</td><td style="padding:6px 8px;font-family:monospace;font-size:12px;">--app-parchment</td><td style="padding:6px 8px;text-align:right;"><span style="background:#f5f5f7;color:#1d1d1f;border:1px solid #e0e0e0;padding:2px 8px;border-radius:4px;font-size:11px;">#f5f5f7</span></td></tr>
+        <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:6px 8px;font-weight:600;">hairline</td><td style="padding:6px 8px;font-family:monospace;font-size:12px;">--app-hairline</td><td style="padding:6px 8px;text-align:right;"><span style="background:#e0e0e0;color:#1d1d1f;padding:2px 8px;border-radius:4px;font-size:11px;">#e0e0e0</span></td></tr>
+        <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:6px 8px;font-weight:600;">ink-muted-48</td><td style="padding:6px 8px;font-family:monospace;font-size:12px;">--app-muted</td><td style="padding:6px 8px;text-align:right;"><span style="background:#7a7a7a;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">#7a7a7a</span></td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="mockup">
+    <div class="mockup-header">Spacing & Radius Tokens</div>
+    <div class="mockup-body">
+      <table style="width:100%;font-size:13px;border-collapse:collapse;font-family:system-ui;">
+        <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:6px 8px;color:#7a7a7a;">Token</td><td style="padding:6px 8px;color:#7a7a7a;">CSS Variable</td><td style="padding:6px 8px;text-align:right;color:#7a7a7a;">Value</td></tr>
+        <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:6px 8px;font-weight:600;">spacing.section</td><td style="padding:6px 8px;font-family:monospace;font-size:12px;">--app-space-section</td><td style="padding:6px 8px;text-align:right;">80px</td></tr>
+        <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:6px 8px;font-weight:600;">spacing.xl</td><td style="padding:6px 8px;font-family:monospace;font-size:12px;">--app-space-xl</td><td style="padding:6px 8px;text-align:right;">32px</td></tr>
+        <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:6px 8px;font-weight:600;">spacing.lg</td><td style="padding:6px 8px;font-family:monospace;font-size:12px;">--app-space-lg</td><td style="padding:6px 8px;text-align:right;">24px</td></tr>
+        <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:6px 8px;font-weight:600;">spacing.md</td><td style="padding:6px 8px;font-family:monospace;font-size:12px;">--app-space-md</td><td style="padding:6px 8px;text-align:right;">17px</td></tr>
+        <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:6px 8px;font-weight:600;">rounded.pill</td><td style="padding:6px 8px;font-family:monospace;font-size:12px;">--app-radius-pill</td><td style="padding:6px 8px;text-align:right;">9999px</td></tr>
+        <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:6px 8px;font-weight:600;">rounded.lg</td><td style="padding:6px 8px;font-family:monospace;font-size:12px;">--app-radius-lg</td><td style="padding:6px 8px;text-align:right;">18px</td></tr>
+        <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:6px 8px;font-weight:600;">rounded.sm</td><td style="padding:6px 8px;font-family:monospace;font-size:12px;">--app-radius-sm</td><td style="padding:6px 8px;text-align:right;">8px</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="mockup" style="margin-top:24px;">
+  <div class="mockup-header">How tokens.css feeds both CSS and Naive UI</div>
+  <div class="mockup-body">
+    <div style="font-family:system-ui;display:flex;gap:24px;align-items:flex-start;">
+      <div style="flex:1;background:#f5f5f7;padding:16px;border-radius:11px;">
+        <div style="font-size:11px;font-weight:600;color:#7a7a7a;margin-bottom:8px;">tokens.css — loaded first</div>
+        <code style="font-size:11px;color:#1d1d1f;line-height:1.6;display:block;">
+          :root {<br>
+          &nbsp;&nbsp;--app-blue: #0066cc;<br>
+          &nbsp;&nbsp;--app-ink: #1d1d1f;<br>
+          &nbsp;&nbsp;--app-canvas: #ffffff;<br>
+          &nbsp;&nbsp;--app-parchment: #f5f5f7;<br>
+          &nbsp;&nbsp;...<br>
+          }
+        </code>
+      </div>
+      <div style="font-size:20px;color:#7a7a7a;padding-top:32px;">→</div>
+      <div style="flex:1;background:#f5f5f7;padding:16px;border-radius:11px;">
+        <div style="font-size:11px;font-weight:600;color:#7a7a7a;margin-bottom:8px;">global.css — typography baseline</div>
+        <code style="font-size:11px;color:#1d1d1f;line-height:1.6;display:block;">
+          body {<br>
+          &nbsp;&nbsp;font-family: "SF Pro Text"...;<br>
+          &nbsp;&nbsp;font-size: 17px;<br>
+          &nbsp;&nbsp;color: var(--app-ink);<br>
+          &nbsp;&nbsp;background: var(--app-parchment);<br>
+          }
+        </code>
+      </div>
+      <div style="font-size:20px;color:#7a7a7a;padding-top:32px;">→</div>
+      <div style="flex:1;background:#f5f5f7;padding:16px;border-radius:11px;">
+        <div style="font-size:11px;font-weight:600;color:#7a7a7a;margin-bottom:8px;">AppLayout.vue — Naive UI theme</div>
+        <code style="font-size:11px;color:#1d1d1f;line-height:1.6;display:block;">
+          themeOverrides: {<br>
+          &nbsp;&nbsp;common: {<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;primaryColor:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'#0066cc',<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;borderRadius:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'18px',<br>
+          &nbsp;&nbsp;}<br>
+          &nbsp;&nbsp;Button: { ... }<br>
+          }
+        </code>
+      </div>
+    </div>
+  </div>
+</div>

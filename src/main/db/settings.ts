@@ -1,0 +1,18 @@
+import { getDb } from '../database'
+
+export const DEEPSEEK_API_KEY = 'deepseek_api_key'
+
+export function getSetting(key: string): string | null {
+  const row = getDb().prepare('SELECT value FROM settings WHERE key = ?').get(key) as { value: string } | undefined
+  return row?.value ?? null
+}
+
+export function setSetting(key: string, value: string): void {
+  getDb().prepare(
+    'INSERT INTO settings (key, value) VALUES (@key, @value) ON CONFLICT(key) DO UPDATE SET value = @value'
+  ).run({ key, value })
+}
+
+export function hasApiKey(): boolean {
+  return getSetting(DEEPSEEK_API_KEY) !== null
+}

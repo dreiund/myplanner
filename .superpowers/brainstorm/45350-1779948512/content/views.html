@@ -1,0 +1,137 @@
+<h2>View-by-View Redesign</h2>
+<p class="subtitle">Each view gets Apple treatment — typography, spacing, card styling, pill buttons.</p>
+
+<div class="mockup" style="margin-bottom:24px;">
+  <div class="mockup-header">1. CalendarView — Main Task View</div>
+  <div class="mockup-body">
+    <div style="font-family:system-ui;display:flex;gap:16px;background:#f5f5f7;padding:16px;border-radius:11px;">
+      <!-- Calendar pane -->
+      <div style="flex:2;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+          <span style="font-size:21px;font-weight:600;color:#1d1d1f;">2026年 5月</span>
+          <div style="display:flex;gap:2px;">
+            <button style="background:#fafafc;border:1px solid #e0e0e0;border-radius:8px;padding:4px 10px;font-size:12px;color:#333;">◀</button>
+            <button style="background:#fafafc;border:1px solid #e0e0e0;border-radius:8px;padding:4px 10px;font-size:12px;color:#333;">▶</button>
+          </div>
+          <button style="background:#fafafc;color:#0066cc;border:1px solid #0066cc;border-radius:999px;padding:4px 14px;font-size:12px;">今天</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;">
+          <div v-for="d in ['一','二','三','四','五','六','日']" style="text-align:center;font-size:11px;color:#7a7a7a;padding:4px;">{{d}}</div>
+          <div v-for="i in 31" style="background:#fff;text-align:center;padding:10px 4px;border-radius:5px;font-size:13px;color:#1d1d1f;min-height:40px;">
+            {{i}}
+            <div v-if="[3,7,14].includes(i)" style="width:5px;height:5px;border-radius:50%;background:#0066cc;margin:3px auto 0;"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Task list pane -->
+      <div style="flex:1;background:#fff;border-radius:11px;padding:16px;border:1px solid #e0e0e0;">
+        <div style="font-size:15px;font-weight:600;color:#1d1d1f;margin-bottom:12px;">5月28日 任务</div>
+        <button style="background:#0066cc;color:#fff;border:none;border-radius:999px;padding:6px 16px;font-size:12px;margin-bottom:12px;">+ 新建任务</button>
+        <div style="padding:10px 0;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:10px;">
+          <div style="width:20px;height:20px;border-radius:50%;border:1.5px solid #ccc;"></div>
+          <span style="font-size:14px;color:#1d1d1f;">完成需求文档</span>
+          <span style="margin-left:auto;background:#f0f0f0;padding:2px 8px;border-radius:999px;font-size:11px;">高</span>
+        </div>
+        <div style="padding:10px 0;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:10px;">
+          <div style="width:20px;height:20px;border-radius:50%;background:#0066cc;border:1.5px solid #0066cc;display:flex;align-items:center;justify-content:center;"><span style="color:#fff;font-size:10px;">✓</span></div>
+          <span style="font-size:14px;color:#999;text-decoration:line-through;">复习算法</span>
+          <span style="margin-left:auto;background:#f0f0f0;padding:2px 8px;border-radius:999px;font-size:11px;">中</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mockup" style="margin-bottom:24px;">
+  <div class="mockup-header">2. ReviewView — Daily Review</div>
+  <div class="mockup-body">
+    <div style="font-family:system-ui;background:#f5f5f7;padding:16px;border-radius:11px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+        <button style="background:#fafafc;border:1px solid #e0e0e0;border-radius:8px;padding:6px 12px;font-size:13px;">◀ 昨天</button>
+        <span style="font-size:17px;font-weight:600;color:#1d1d1f;">2026-05-28</span>
+        <button style="background:#fafafc;border:1px solid #e0e0e0;border-radius:8px;padding:6px 12px;font-size:13px;">明天 ▶</button>
+      </div>
+      <!-- Stats row -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+        <div style="background:#fff;padding:16px;border-radius:11px;border:1px solid #e0e0e0;">
+          <div style="font-size:24px;font-weight:600;color:#1d1d1f;">5</div>
+          <div style="font-size:12px;color:#7a7a7a;">已完成</div>
+        </div>
+        <div style="background:#fff;padding:16px;border-radius:11px;border:1px solid #e0e0e0;">
+          <div style="font-size:24px;font-weight:600;color:#1d1d1f;">71%</div>
+          <div style="font-size:12px;color:#7a7a7a;">完成率</div>
+        </div>
+        <div style="background:#fff;padding:16px;border-radius:11px;border:1px solid #e0e0e0;">
+          <div style="font-size:24px;font-weight:600;color:#1d1d1f;">3h</div>
+          <div style="font-size:12px;color:#7a7a7a;">预估</div>
+        </div>
+        <div style="background:#fff;padding:16px;border-radius:11px;border:1px solid #e0e0e0;">
+          <div style="font-size:24px;font-weight:600;color:#1d1d1f;">2.5h</div>
+          <div style="font-size:12px;color:#7a7a7a;">实际</div>
+        </div>
+      </div>
+      <!-- Review text area -->
+      <div style="background:#fff;padding:16px;border-radius:11px;border:1px solid #e0e0e0;">
+        <div style="font-size:15px;font-weight:600;color:#1d1d1f;margin-bottom:8px;">今日复盘</div>
+        <textarea style="width:100%;border:1px solid #e0e0e0;border-radius:11px;padding:12px;font-size:15px;min-height:80px;resize:none;box-sizing:border-box;" placeholder="记录今天的收获和思考..."></textarea>
+        <button style="margin-top:8px;background:#0066cc;color:#fff;border:none;border-radius:999px;padding:8px 20px;font-size:14px;">保存复盘</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mockup" style="margin-bottom:24px;">
+  <div class="mockup-header">3. ReportView — Stats & Charts</div>
+  <div class="mockup-body">
+    <div style="font-family:system-ui;background:#f5f5f7;padding:16px;border-radius:11px;">
+      <!-- Segmented control -->
+      <div style="display:flex;background:#f0f0f0;border-radius:999px;padding:3px;width:fit-content;margin-bottom:20px;">
+        <div style="background:#fff;border-radius:999px;padding:6px 18px;font-size:13px;color:#1d1d1f;box-shadow:0 1px 2px rgba(0,0,0,0.06);">日报</div>
+        <div style="padding:6px 18px;font-size:13px;color:#7a7a7a;">周报</div>
+        <div style="padding:6px 18px;font-size:13px;color:#7a7a7a;">月报</div>
+      </div>
+      <!-- Chart area -->
+      <div style="background:#fff;border-radius:11px;border:1px solid #e0e0e0;padding:20px;margin-bottom:16px;">
+        <div style="font-size:15px;font-weight:600;color:#1d1d1f;margin-bottom:12px;">任务趋势</div>
+        <div style="height:160px;background:linear-gradient(to bottom, #f0f0f0 0%, #fafafc 100%);border-radius:8px;display:flex;align-items:flex-end;padding:8px;gap:12px;">
+          <div style="flex:1;background:#0066cc;height:60px;border-radius:4px 4px 0 0;"></div>
+          <div style="flex:1;background:#0066cc;height:90px;border-radius:4px 4px 0 0;"></div>
+          <div style="flex:1;background:#0066cc;height:75px;border-radius:4px 4px 0 0;"></div>
+          <div style="flex:1;background:#0066cc;height:110px;border-radius:4px 4px 0 0;"></div>
+          <div style="flex:1;background:#0066cc;height:85px;border-radius:4px 4px 0 0;"></div>
+          <div style="flex:1;background:#0066cc;height:50px;border-radius:4px 4px 0 0;"></div>
+          <div style="flex:1;background:#0066cc;height:100px;border-radius:4px 4px 0 0;"></div>
+        </div>
+      </div>
+      <!-- AI button -->
+      <button style="background:#1d1d1f;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;">AI 摘要</button>
+    </div>
+  </div>
+</div>
+
+<div class="mockup">
+  <div class="mockup-header">4. AIReportView — AI Report Generation</div>
+  <div class="mockup-body">
+    <div style="font-family:system-ui;background:#f5f5f7;padding:16px;border-radius:11px;">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px;">
+        <div style="display:flex;background:#f0f0f0;border-radius:999px;padding:3px;">
+          <div style="background:#fff;border-radius:999px;padding:6px 16px;font-size:12px;color:#1d1d1f;box-shadow:0 1px 2px rgba(0,0,0,0.06);">日报</div>
+          <div style="padding:6px 16px;font-size:12px;color:#7a7a7a;">周报</div>
+          <div style="padding:6px 16px;font-size:12px;color:#7a7a7a;">月报</div>
+        </div>
+        <span style="font-size:13px;color:#1d1d1f;">2026-05-28</span>
+        <button style="margin-left:auto;background:#0066cc;color:#fff;border:none;border-radius:999px;padding:8px 20px;font-size:14px;">生成汇报</button>
+      </div>
+      <!-- Result card -->
+      <div style="background:#fff;border-radius:11px;border:1px solid #e0e0e0;padding:20px;">
+        <div style="font-size:12px;color:#7a7a7a;margin-bottom:12px;">生成于 2026/5/28 14:30</div>
+        <div style="font-size:15px;color:#1d1d1f;line-height:1.8;">
+          <div style="font-weight:600;margin-bottom:4px;">今日总结</div>
+          <div style="color:#333;margin-bottom:12px;">今天共完成 5 个任务，完成率 71%。工作分类投入最多时间...</div>
+          <div style="font-weight:600;margin-bottom:4px;">亮点</div>
+          <div style="color:#333;">需求文档提前半天交付，获得团队认可。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

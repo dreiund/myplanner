@@ -1,0 +1,49 @@
+<h2>复盘区域展开/收起行为</h2>
+<p class="subtitle">保存复盘后，复盘内容应该怎么收起来？</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>抽屉式收起</h3>
+      <p>保存后复盘区域收缩为一行标题栏："✏️ 今日复盘 ✓ 已保存"，点击标题栏展开查看/编辑。收起状态下能看到已保存的摘要。</p>
+      <div style="margin-top:8px;padding:8px;background:#1a1a1a;border-radius:4px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span>✏️ 今日复盘 <span style="color:#18a058;font-size:12px">✓ 已保存</span></span>
+          <span style="color:#888;font-size:12px">展开 ▼</span>
+        </div>
+        <div style="color:#666;font-size:12px;margin-top:4px">今天完成了核心功能开发，修复了3个bug...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>完全折叠为按钮</h3>
+      <p>保存后复盘区域折叠成一个蓝色提示条，点击"展开复盘"恢复编辑状态。</p>
+      <div style="margin-top:8px;padding:8px;background:#1a1a1a;border-radius:4px">
+        <div style="display:flex;align-items:center;gap:8px;color:#2080f0">
+          <span>📝</span>
+          <span>已保存复盘内容</span>
+          <span style="margin-left:auto;font-size:12px">点击展开</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Tab 切换</h3>
+      <p>复盘区域拆分为「查看」和「编辑」两个 Tab。保存后自动切到「查看」Tab，显示格式化文本。「编辑」Tab 可继续修改。</p>
+      <div style="margin-top:8px;padding:8px;background:#1a1a1a;border-radius:4px">
+        <div style="display:flex;gap:8px;margin-bottom:4px;font-size:12px">
+          <span style="padding:2px 8px;border-bottom:2px solid #2080f0;color:#2080f0">查看</span>
+          <span style="padding:2px 8px;color:#666">编辑</span>
+        </div>
+        <div style="color:#ccc;font-size:13px">今天完成了核心功能开发，修复了3个bug...</div>
+      </div>
+    </div>
+  </div>
+</div>
