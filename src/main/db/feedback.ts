@@ -29,3 +29,18 @@ export function getFeedbackByDate(date: string): FeedbackRow[] {
     ORDER BY tf.created_at DESC
   `).all(date) as FeedbackRow[]
 }
+
+export interface FeedbackWithTaskRow extends FeedbackRow {
+  task_title: string
+  planned_date: string
+}
+
+export function getFeedbackByDateRange(startDate: string, endDate: string): FeedbackWithTaskRow[] {
+  return getDb().prepare(`
+    SELECT tf.*, t.title as task_title, t.planned_date
+    FROM task_feedback tf
+    JOIN tasks t ON t.id = tf.task_id
+    WHERE t.planned_date >= ? AND t.planned_date <= ?
+    ORDER BY t.planned_date ASC, tf.created_at DESC
+  `).all(startDate, endDate) as FeedbackWithTaskRow[]
+}

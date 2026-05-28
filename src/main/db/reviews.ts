@@ -23,3 +23,9 @@ export function saveReview(date: string, content: string): ReviewRow {
   `).run({ date, content })
   return db.prepare('SELECT * FROM daily_reviews WHERE date = ?').get(date) as ReviewRow
 }
+
+export function getReviewsByDateRange(startDate: string, endDate: string): ReviewRow[] {
+  return getDb().prepare(
+    "SELECT * FROM daily_reviews WHERE date >= ? AND date <= ? ORDER BY date ASC"
+  ).all(startDate, endDate) as ReviewRow[]
+}

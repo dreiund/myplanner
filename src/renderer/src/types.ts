@@ -67,6 +67,11 @@ export interface TaskFeedback {
   created_at: string
 }
 
+export interface FeedbackWithTask extends TaskFeedback {
+  task_title: string
+  planned_date: string
+}
+
 export interface GenerateReportInput {
   granularity: string
   dateRange: { start: string; end: string }
@@ -80,6 +85,7 @@ export interface ElectronAPI {
   tasks: {
     getByDate: (date: string) => Promise<Task[]>
     getByMonth: (year: number, month: number) => Promise<Task[]>
+    getByDateRange: (startDate: string, endDate: string) => Promise<Task[]>
     create: (data: Partial<Task>) => Promise<Task>
     update: (id: number, data: Partial<Task>) => Promise<Task>
     remove: (id: number) => Promise<void>
@@ -93,6 +99,7 @@ export interface ElectronAPI {
   }
   reviews: {
     getByDate: (date: string) => Promise<Review | undefined>
+    getByDateRange: (startDate: string, endDate: string) => Promise<Review[]>
     save: (date: string, content: string) => Promise<Review>
   }
   stats: {
@@ -115,6 +122,7 @@ export interface ElectronAPI {
     save: (taskId: number, problems: string, optimizations: string) => Promise<TaskFeedback>
     getByTask: (taskId: number) => Promise<TaskFeedback | undefined>
     getByDate: (date: string) => Promise<TaskFeedback[]>
+    getByDateRange: (startDate: string, endDate: string) => Promise<FeedbackWithTask[]>
   }
 }
 

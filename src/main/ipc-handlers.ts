@@ -7,12 +7,13 @@ import * as reviewDb from './db/reviews'
 import * as settingsDb from './db/settings'
 import * as feedbackDb from './db/feedback'
 import * as ai from './ai'
-import { getDb } from './database'
 
 export function registerIpcHandlers(): void {
   // Tasks
   ipcMain.handle('tasks:getByDate', (_e, date: string) => taskDb.getTasksByDate(date))
   ipcMain.handle('tasks:getByMonth', (_e, year: number, month: number) => taskDb.getTasksByMonth(year, month))
+  ipcMain.handle('tasks:getByDateRange', (_e, startDate: string, endDate: string) =>
+    taskDb.getTasksByDateRange(startDate, endDate))
   ipcMain.handle('tasks:create', (_e, data) => taskDb.createTask(data))
   ipcMain.handle('tasks:update', (_e, id: number, data) => taskDb.updateTask(id, data))
   ipcMain.handle('tasks:remove', (_e, id: number) => taskDb.removeTask(id))
@@ -26,6 +27,8 @@ export function registerIpcHandlers(): void {
 
   // Reviews
   ipcMain.handle('reviews:getByDate', (_e, date: string) => reviewDb.getReviewByDate(date))
+  ipcMain.handle('reviews:getByDateRange', (_e, startDate: string, endDate: string) =>
+    reviewDb.getReviewsByDateRange(startDate, endDate))
   ipcMain.handle('reviews:save', (_e, date: string, content: string) => reviewDb.saveReview(date, content))
 
   // Feedback
@@ -33,6 +36,8 @@ export function registerIpcHandlers(): void {
     feedbackDb.saveFeedback(taskId, problems, optimizations))
   ipcMain.handle('feedback:getByTask', (_e, taskId: number) => feedbackDb.getFeedbackByTask(taskId))
   ipcMain.handle('feedback:getByDate', (_e, date: string) => feedbackDb.getFeedbackByDate(date))
+  ipcMain.handle('feedback:getByDateRange', (_e, startDate: string, endDate: string) =>
+    feedbackDb.getFeedbackByDateRange(startDate, endDate))
 
   // Settings
   ipcMain.handle('settings:hasApiKey', () => settingsDb.hasApiKey())
@@ -58,10 +63,7 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle('stats:getWeekly', (_e, startDate: string, endDate: string) => {
-    const db = getDb()
-    const tasks = db.prepare(
-      "SELECT * FROM tasks WHERE planned_date >= ? AND planned_date <= ? ORDER BY planned_date"
-    ).all(startDate, endDate) as taskDb.TaskRow[]
+    const tasks = taskDb.getTasksByDateRange(startDate, endDate)
     const byDate = new Map<string, taskDb.TaskRow[]>()
     for (const t of tasks) {
       const arr = byDate.get(t.planned_date) || []

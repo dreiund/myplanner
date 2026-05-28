@@ -19,6 +19,57 @@ const WORD_LIMITS: Record<string, string> = {
 
 function buildPrompt(input: GenerateInput): string {
   const label = { daily: '日报', weekly: '周报', monthly: '月报', quarterly: '季报', annual: '年报' }[input.granularity]
+  if (input.granularity === 'weekly') {
+    return `你是一个个人效率助手，请根据以下数据生成一份周报。
+
+时间范围：${input.dateRange.start} 至 ${input.dateRange.end}
+字数要求：${WORD_LIMITS['weekly']}
+
+【每日任务详情】
+${input.tasks || '无任务数据'}
+
+【复盘总结】
+${input.reviewContent || '无复盘内容'}
+
+【任务反馈】（完成每个任务时填写的问题和优化建议）
+${input.feedback || '无反馈数据'}
+
+【统计数据】
+${input.stats || '无统计数据'}
+
+请严格按以下 Markdown 格式输出周报：
+
+# 周报 - ${input.dateRange.start} ~ ${input.dateRange.end}
+**汇报人：** 冯可成
+
+## 一、本周进展
+
+事项：
+- （根据已完成的任务，每个事项用简洁的一句话概括，按日或按类别组织）
+
+## 二、需要关注的问题
+
+- 问题
+1. （根据任务反馈中遇到的问题提炼关键问题）
+2. ...
+
+- 处理方法
+1. （针对上述问题的处理建议，需要具体可行）
+2. ...
+
+## 三、下一周的计划
+
+1. （根据本周未完成的任务和复盘总结，合理推断下一周应推进的事项）
+2. ...
+3. ...
+
+要求：
+- 「事项」根据实际完成的任务填充，每项一句话，突出成果
+- 「需要关注的问题」根据任务反馈（遇到的问题+优化建议）提炼关键问题，处理方法要具体可行
+- 「下一周的计划」基于本周未完成事项和复盘内容合理推断
+- 如果用到的数据不足，相关部分可以简写
+- 简洁有力，用数据和事实说话`
+  }
   if (input.granularity === 'daily') {
     return `你是一个个人效率助手，请根据以下数据生成一份日报。
 

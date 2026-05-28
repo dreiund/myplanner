@@ -61,8 +61,9 @@
         </div>
       </n-card>
       <div class="chart-row">
-        <ReportChart ref="chartRef1" v-if="trendOption" :option="trendOption" style="flex:3;height:300px" />
-        <ReportChart ref="chartRef2" v-if="pieOption" :option="pieOption" style="flex:1;height:300px" />
+        <ReportChart ref="chartRef1" v-if="taskCountOption" :option="taskCountOption" style="flex:1;height:300px" />
+        <ReportChart ref="chartRef2" v-if="rateOption" :option="rateOption" style="flex:1;height:300px" />
+        <ReportChart ref="chartRef3" v-if="pieOption" :option="pieOption" style="flex:1;height:300px" />
       </div>
     </template>
 
@@ -131,10 +132,13 @@ const todayTasks = ref<Task[]>([])
 const weeklyData = ref<WeeklyStats | null>(null)
 const monthlyData = ref<MonthlyStats | null>(null)
 const trendOption = ref<any>(null)
+const taskCountOption = ref<any>(null)
+const rateOption = ref<any>(null)
 const pieOption = ref<any>(null)
 const referenceDate = ref(new Date())
 const chartRef1 = ref<InstanceType<typeof ReportChart> | null>(null)
 const chartRef2 = ref<InstanceType<typeof ReportChart> | null>(null)
+const chartRef3 = ref<InstanceType<typeof ReportChart> | null>(null)
 const message = useMessage()
 
 const aiLoading = ref(false)
@@ -206,6 +210,30 @@ function buildTrendOption(days: { date: string; total: number; rate: number }[])
   }
 }
 
+function buildTaskCountOption(days: { date: string; total: number }[]) {
+  return {
+    title: { text: '每日任务数', textStyle: { color: '#333', fontSize: 14 } },
+    tooltip: { trigger: 'axis' },
+    xAxis: { type: 'category', data: days.map(d => d.date.slice(5)), axisLabel: { color: '#7a7a7a' } },
+    yAxis: { type: 'value', max: 10, min: 0, interval: 2, axisLabel: { color: '#7a7a7a' }, splitLine: { lineStyle: { color: '#f0f0f0' } } },
+    series: [
+      { name: '任务数', type: 'bar', data: days.map(d => d.total), itemStyle: { color: '#0066cc' } }
+    ]
+  }
+}
+
+function buildRateOption(days: { date: string; rate: number }[]) {
+  return {
+    title: { text: '每日完成率', textStyle: { color: '#333', fontSize: 14 } },
+    tooltip: { trigger: 'axis' },
+    xAxis: { type: 'category', data: days.map(d => d.date.slice(5)), axisLabel: { color: '#7a7a7a' } },
+    yAxis: { type: 'value', max: 100, axisLabel: { color: '#7a7a7a', formatter: '{value}%' }, splitLine: { lineStyle: { color: '#f0f0f0' } } },
+    series: [
+      { name: '完成率%', type: 'line', data: days.map(d => d.rate), smooth: true, itemStyle: { color: '#18a058' }, areaStyle: { color: 'rgba(24,160,88,0.1)' } }
+    ]
+  }
+}
+
 function buildPieOption(byCategory: Record<string, number>) {
   const data = Object.entries(byCategory)
     .filter(([_, v]) => v > 0)
@@ -225,6 +253,8 @@ function buildPieOption(byCategory: Record<string, number>) {
 // Load data
 async function loadStats() {
   trendOption.value = null
+  taskCountOption.value = null
+  rateOption.value = null
   pieOption.value = null
   aiContent.value = ''
   aiError.value = ''
@@ -243,7 +273,8 @@ async function loadStats() {
       monthlyData.value = null
       const days = weeklyData.value.days
       if (days.length > 0) {
-        trendOption.value = buildTrendOption(days)
+        taskCountOption.value = buildTaskCountOption(days)
+        rateOption.value = buildRateOption(days)
         pieOption.value = buildPieOption(weeklyData.value.byCategory)
       }
     } else {
@@ -265,7 +296,7 @@ async function loadStats() {
 
 // Export
 async function exportCharts() {
-  const charts = [chartRef1.value?.getChart(), chartRef2.value?.getChart()].filter(Boolean)
+  const charts = [chartRef1.value?.getChart(), chartRef2.value?.getChart(), chartRef3.value?.getChart()].filter(Boolean)
   for (const chart of charts) {
     if (!chart) continue
     const dataUrl = chart!.getDataURL({ type: 'png', pixelRatio: 2, backgroundColor: '#ffffff' })
@@ -317,8 +348,50 @@ async function generateAiSummary() {
       aiLoading.value = false
       return
     } else if (granularity.value === 'weekly' && weeklyData.value) {
-      tasks = weeklyData.value.days.map(d => `- ${d.date}: ${d.done}/${d.total} 完成, 完成率 ${d.rate}%`).join('\n')
-      statsText = `总任务 ${weeklySummary.value.total}, 完成率 ${weeklySummary.value.rate}%, 预估 ${fmtMin(weeklyData.value.totalEstimated)}, 实际 ${fmtMin(weeklyData.value.totalActual)}`
+      const allTasks = await api.tasks.getByDateRange(dateRange.start, dateRange.end)
+      const byDate = new Map<string, typeof allTasks>()
+      for (const t of allTasks) {
+        const arr = byDate.get(t.planned_date) || []
+        arr.push(t)
+        byDate.set(t.planned_date, arr)
+      }
+      const sortedDates = [...byDate.keys()].sort()
+      tasks = sortedDates.map(date => {
+        const dayTasks = byDate.get(date)!
+        return `\n## ${date}\n` + dayTasks.map(t =>
+          `- [${t.status === 'done' ? 'x' : ' '}] ${t.title} (${t.category}, ${t.priority}, 估${t.estimated_min || 0}min/实${t.actual_min || 0}min)`
+        ).join('\n')
+      }).join('\n')
+
+      const reviews = await api.reviews.getByDateRange(dateRange.start, dateRange.end)
+      reviewContent = reviews.filter(r => r.content).map(r => `### ${r.date}\n${r.content}`).join('\n\n')
+
+      const fbList = await api.feedback.getByDateRange(dateRange.start, dateRange.end)
+      const fbText = fbList.map(f =>
+        `- [${f.planned_date}] 任务「${f.task_title}」: 问题：${f.problems || '无'} / 优化：${f.optimizations || '无'}`
+      ).join('\n')
+
+      const doneCount = allTasks.filter(t => t.status === 'done').length
+      const doneRate = allTasks.length > 0 ? Math.round(doneCount / allTasks.length * 100) : 0
+      const perDayStats = sortedDates.map(date => {
+        const dayTasks = byDate.get(date)!
+        const dayDone = dayTasks.filter(t => t.status === 'done').length
+        const dayRate = dayTasks.length > 0 ? Math.round(dayDone / dayTasks.length * 100) : 0
+        return `- ${date}: 任务数 ${dayTasks.length} 个 | 完成率 ${dayRate}%`
+      }).join('\n')
+      statsText = `${perDayStats}\n\n本周汇总:\n- 任务总数: ${allTasks.length} 个\n- 已完成: ${doneCount} 个\n- 完成率: ${doneRate}%\n- 预估耗时: ${weeklyData.value.totalEstimated}min\n- 实际耗时: ${weeklyData.value.totalActual}min`
+
+      const result = await api.ai.generateReport({
+        granularity: 'weekly',
+        dateRange,
+        tasks,
+        reviewContent,
+        stats: statsText,
+        feedback: fbText
+      })
+      aiContent.value = result.content
+      aiGeneratedAt.value = new Date().toLocaleString('zh-CN')
+      return
     } else if (granularity.value === 'monthly' && monthlyData.value) {
       tasks = monthlyData.value.days.map(d => `- ${d.date}: ${d.done}/${d.total} 完成, 完成率 ${d.rate}%`).join('\n')
       statsText = `总任务 ${monthlyData.value.total}, 完成 ${monthlyData.value.done}, 完成率 ${monthlyData.value.rate}%`

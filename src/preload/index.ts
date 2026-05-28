@@ -4,6 +4,7 @@ const electronAPI = {
   tasks: {
     getByDate: (date: string) => ipcRenderer.invoke('tasks:getByDate', date),
     getByMonth: (year: number, month: number) => ipcRenderer.invoke('tasks:getByMonth', year, month),
+    getByDateRange: (startDate: string, endDate: string) => ipcRenderer.invoke('tasks:getByDateRange', startDate, endDate),
     create: (task: Record<string, unknown>) => ipcRenderer.invoke('tasks:create', task),
     update: (id: number, data: Record<string, unknown>) => ipcRenderer.invoke('tasks:update', id, data),
     remove: (id: number) => ipcRenderer.invoke('tasks:remove', id),
@@ -17,6 +18,7 @@ const electronAPI = {
   },
   reviews: {
     getByDate: (date: string) => ipcRenderer.invoke('reviews:getByDate', date),
+    getByDateRange: (startDate: string, endDate: string) => ipcRenderer.invoke('reviews:getByDateRange', startDate, endDate),
     save: (date: string, content: string) => ipcRenderer.invoke('reviews:save', date, content)
   },
   stats: {
@@ -39,6 +41,7 @@ const electronAPI = {
     save: (taskId: number, problems: string, optimizations: string) => ipcRenderer.invoke('feedback:save', taskId, problems, optimizations),
     getByTask: (taskId: number) => ipcRenderer.invoke('feedback:getByTask', taskId),
     getByDate: (date: string) => ipcRenderer.invoke('feedback:getByDate', date),
+    getByDateRange: (startDate: string, endDate: string) => ipcRenderer.invoke('feedback:getByDateRange', startDate, endDate),
   }
 }
 

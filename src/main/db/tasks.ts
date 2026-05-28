@@ -27,6 +27,13 @@ export function getTasksByMonth(year: number, month: number): TaskRow[] {
   return db.prepare("SELECT * FROM tasks WHERE planned_date LIKE ? ORDER BY planned_date, priority DESC").all(`${prefix}%`) as TaskRow[]
 }
 
+export function getTasksByDateRange(startDate: string, endDate: string): TaskRow[] {
+  const db = getDb()
+  return db.prepare(
+    "SELECT * FROM tasks WHERE planned_date >= ? AND planned_date <= ? ORDER BY planned_date ASC, priority DESC"
+  ).all(startDate, endDate) as TaskRow[]
+}
+
 export function createTask(data: {
   title: string; planned_date: string; priority?: string; category?: string;
   due_date?: string; note?: string; estimated_min?: number

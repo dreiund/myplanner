@@ -1,4 +1,3 @@
-[README.md](https://github.com/user-attachments/files/28343156/README.md)
 # MyPlanner
 
 MyPlanner 是一个本地优先的个人效率管理桌面应用，用来管理每日任务、记录复盘、查看统计报表，并通过 DeepSeek 生成日报、周报、月报、季报和年报。

@@ -150,8 +150,51 @@ async function generate() {
       generatedAt.value = new Date().toLocaleString('zh-CN')
       return
     } else if (granularity.value === 'weekly') {
+      const allTasks = await api.tasks.getByDateRange(range.start, range.end)
+      const byDate = new Map<string, typeof allTasks>()
+      for (const t of allTasks) {
+        const arr = byDate.get(t.planned_date) || []
+        arr.push(t)
+        byDate.set(t.planned_date, arr)
+      }
+      const sortedDates = [...byDate.keys()].sort()
+      tasksText = sortedDates.map(date => {
+        const dayTasks = byDate.get(date)!
+        return `\n## ${date}\n` + dayTasks.map(t =>
+          `- [${t.status === 'done' ? 'x' : ' '}] ${t.title} (${t.category}, ${t.priority}, 估${t.estimated_min || 0}min/实${t.actual_min || 0}min)`
+        ).join('\n')
+      }).join('\n')
+
+      const reviews = await api.reviews.getByDateRange(range.start, range.end)
+      reviewText = reviews.filter(r => r.content).map(r => `### ${r.date}\n${r.content}`).join('\n\n')
+
+      const fbList = await api.feedback.getByDateRange(range.start, range.end)
+      const fbText = fbList.map(f =>
+        `- [${f.planned_date}] 任务「${f.task_title}」: 问题：${f.problems || '无'} / 优化：${f.optimizations || '无'}`
+      ).join('\n')
+
       const raw = await api.stats.getWeekly(range.start, range.end)
-      tasksText = raw.days.map(d => `- ${d.date}: ${d.done}/${d.total} 完成, 完成率 ${d.rate}%`).join('\n')
+      const doneCount = allTasks.filter(t => t.status === 'done').length
+      const doneRate = allTasks.length > 0 ? Math.round(doneCount / allTasks.length * 100) : 0
+      const perDayStats = sortedDates.map(date => {
+        const dayTasks = byDate.get(date)!
+        const dayDone = dayTasks.filter(t => t.status === 'done').length
+        const dayRate = dayTasks.length > 0 ? Math.round(dayDone / dayTasks.length * 100) : 0
+        return `- ${date}: 任务数 ${dayTasks.length} 个 | 完成率 ${dayRate}%`
+      }).join('\n')
+      const statsText = `${perDayStats}\n\n本周汇总:\n- 任务总数: ${allTasks.length} 个\n- 已完成: ${doneCount} 个\n- 完成率: ${doneRate}%\n- 预估耗时: ${raw.totalEstimated}min\n- 实际耗时: ${raw.totalActual}min`
+
+      const result = await api.ai.generateReport({
+        granularity: granularity.value,
+        dateRange: range,
+        tasks: tasksText,
+        reviewContent: reviewText,
+        stats: statsText,
+        feedback: fbText
+      })
+      content.value = result.content
+      generatedAt.value = new Date().toLocaleString('zh-CN')
+      return
     } else if (granularity.value === 'monthly') {
       const y = referenceDate.value.getFullYear(); const m = referenceDate.value.getMonth() + 1
       const raw = await api.stats.getMonthly(y, m)
