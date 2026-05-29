@@ -60,6 +60,15 @@ import { api } from '../api'
 import { formatDate, getWeekRange } from '../utils/date'
 import { renderMarkdown } from '../utils/markdown'
 
+function formatMinutes(min: number): string {
+  if (min >= 60) {
+    const h = Math.floor(min / 60)
+    const m = min % 60
+    return m > 0 ? `${h}h${m}m` : `${h}h`
+  }
+  return `${min}m`
+}
+
 const granularity = ref('daily')
 const segOptions = [
   { label: '日报', value: 'daily' },
@@ -133,17 +142,28 @@ async function generate() {
     let reviewText = ''
     if (granularity.value === 'daily') {
       const tasks = await api.tasks.getByDate(range.start)
-      tasksText = tasks.map(t => `- [${t.status === 'done' ? 'x' : ' '}] ${t.title} (${t.category}, ${t.priority}, 估${t.estimated_min || 0}min/实${t.actual_min || 0}min)`).join('\n')
+      const workTasks = tasks.filter(t => t.category === 'work')
+      tasksText = workTasks.map(t => `- [${t.status === 'done' ? 'x' : ' '}] ${t.title} (${t.priority}, 估${t.estimated_min || 0}min/实${t.actual_min || 0}min)`).join('\n')
       const r = await api.reviews.getByDate(range.start)
       reviewText = r?.content || ''
       const fbList = await api.feedback.getByDate(range.start)
       const fbText = fbList.map(f => `- 问题：${f.problems || '无'} / 优化：${f.optimizations || '无'}`).join('\n')
+
+      // 按分类统计
+      const dailyStats = await api.stats.getDaily(range.start)
+      const catStats = dailyStats.byCategory
+      const statsText = [
+        `- 工作：${formatMinutes(catStats.work || 0)}`,
+        `- 学习：${formatMinutes(catStats.study || 0)}`,
+        `- 生活：${formatMinutes(catStats.life || 0)}`
+      ].join('\n')
+
       const result = await api.ai.generateReport({
         granularity: granularity.value,
         dateRange: range,
         tasks: tasksText,
         reviewContent: reviewText,
-        stats: tasksText,
+        stats: statsText,
         feedback: fbText
       })
       content.value = result.content
@@ -151,8 +171,9 @@ async function generate() {
       return
     } else if (granularity.value === 'weekly') {
       const allTasks = await api.tasks.getByDateRange(range.start, range.end)
-      const byDate = new Map<string, typeof allTasks>()
-      for (const t of allTasks) {
+      const workTasks = allTasks.filter(t => t.category === 'work')
+      const byDate = new Map<string, typeof workTasks>()
+      for (const t of workTasks) {
         const arr = byDate.get(t.planned_date) || []
         arr.push(t)
         byDate.set(t.planned_date, arr)
@@ -161,7 +182,7 @@ async function generate() {
       tasksText = sortedDates.map(date => {
         const dayTasks = byDate.get(date)!
         return `\n## ${date}\n` + dayTasks.map(t =>
-          `- [${t.status === 'done' ? 'x' : ' '}] ${t.title} (${t.category}, ${t.priority}, 估${t.estimated_min || 0}min/实${t.actual_min || 0}min)`
+          `- [${t.status === 'done' ? 'x' : ' '}] ${t.title} (${t.priority}, 估${t.estimated_min || 0}min/实${t.actual_min || 0}min)`
         ).join('\n')
       }).join('\n')
 
@@ -174,15 +195,16 @@ async function generate() {
       ).join('\n')
 
       const raw = await api.stats.getWeekly(range.start, range.end)
-      const doneCount = allTasks.filter(t => t.status === 'done').length
-      const doneRate = allTasks.length > 0 ? Math.round(doneCount / allTasks.length * 100) : 0
+      const doneCount = workTasks.filter(t => t.status === 'done').length
+      const doneRate = workTasks.length > 0 ? Math.round(doneCount / workTasks.length * 100) : 0
       const perDayStats = sortedDates.map(date => {
         const dayTasks = byDate.get(date)!
         const dayDone = dayTasks.filter(t => t.status === 'done').length
         const dayRate = dayTasks.length > 0 ? Math.round(dayDone / dayTasks.length * 100) : 0
         return `- ${date}: 任务数 ${dayTasks.length} 个 | 完成率 ${dayRate}%`
       }).join('\n')
-      const statsText = `${perDayStats}\n\n本周汇总:\n- 任务总数: ${allTasks.length} 个\n- 已完成: ${doneCount} 个\n- 完成率: ${doneRate}%\n- 预估耗时: ${raw.totalEstimated}min\n- 实际耗时: ${raw.totalActual}min`
+      const catStats = raw.byCategory
+      const statsText = `${perDayStats}\n\n本周汇总（仅工作类任务）:\n- 任务总数: ${workTasks.length} 个\n- 已完成: ${doneCount} 个\n- 完成率: ${doneRate}%\n- 预估耗时: ${raw.totalEstimated}min\n- 实际耗时: ${raw.totalActual}min\n\n按分类耗时:\n- 工作：${formatMinutes(catStats.work || 0)}\n- 学习：${formatMinutes(catStats.study || 0)}\n- 生活：${formatMinutes(catStats.life || 0)}`
 
       const result = await api.ai.generateReport({
         granularity: granularity.value,
@@ -197,20 +219,70 @@ async function generate() {
       return
     } else if (granularity.value === 'monthly') {
       const y = referenceDate.value.getFullYear(); const m = referenceDate.value.getMonth() + 1
+      const allTasks = await api.tasks.getByMonth(y, m)
+      const workTasks = allTasks.filter(t => t.category === 'work')
       const raw = await api.stats.getMonthly(y, m)
-      tasksText = `总计 ${raw.total} 个任务, 完成 ${raw.done} 个, 完成率 ${raw.rate}%`
+      const catStats = raw.byCategory
+
+      // 按日期组织工作类任务
+      const byDate = new Map<string, typeof workTasks>()
+      for (const t of workTasks) {
+        const arr = byDate.get(t.planned_date) || []
+        arr.push(t)
+        byDate.set(t.planned_date, arr)
+      }
+      const sortedDates = [...byDate.keys()].sort()
+      tasksText = sortedDates.map(date => {
+        const dayTasks = byDate.get(date)!
+        return `\n## ${date}\n` + dayTasks.map(t =>
+          `- [${t.status === 'done' ? 'x' : ' '}] ${t.title} (${t.priority}, 估${t.estimated_min || 0}min/实${t.actual_min || 0}min)`
+        ).join('\n')
+      }).join('\n')
+
+      const workDone = workTasks.filter(t => t.status === 'done').length
+      const workRate = workTasks.length > 0 ? Math.round(workDone / workTasks.length * 100) : 0
+      const statsText = `工作类任务总计: ${workTasks.length} 个, 完成 ${workDone} 个, 完成率 ${workRate}%\n\n按分类耗时:\n- 工作：${formatMinutes(catStats.work || 0)}\n- 学习：${formatMinutes(catStats.study || 0)}\n- 生活：${formatMinutes(catStats.life || 0)}`
+
+      const reviews = await api.reviews.getByDateRange(range.start, range.end)
+      reviewText = reviews.filter(r => r.content).map(r => `### ${r.date}\n${r.content}`).join('\n\n')
+
+      const result = await api.ai.generateReport({
+        granularity: granularity.value,
+        dateRange: range,
+        tasks: tasksText,
+        reviewContent: reviewText,
+        stats: statsText
+      })
+      content.value = result.content
+      generatedAt.value = new Date().toLocaleString('zh-CN')
+      return
     } else if (granularity.value === 'quarterly' || granularity.value === 'annual') {
-      tasksText = `时间范围: ${range.start} 至 ${range.end}`
+      const allTasks = await api.tasks.getByDateRange(range.start, range.end)
+      const workTasks = allTasks.filter(t => t.category === 'work')
+      const workDone = workTasks.filter(t => t.status === 'done').length
+      const workRate = workTasks.length > 0 ? Math.round(workDone / workTasks.length * 100) : 0
+
+      // 按分类手动统计
+      const cat: Record<string, number> = { work: 0, study: 0, life: 0 }
+      for (const t of allTasks) {
+        if (t.status === 'done') {
+          cat[t.category] = (cat[t.category] || 0) + 1
+        }
+      }
+      tasksText = `工作类任务总计: ${workTasks.length} 个, 完成 ${workDone} 个, 完成率 ${workRate}%`
+      const statsText = `工作类任务总计: ${workTasks.length} 个, 完成 ${workDone} 个, 完成率 ${workRate}%\n\n各分类完成数:\n- 工作：${cat.work} 个\n- 学习：${cat.study} 个\n- 生活：${cat.life} 个`
+
+      const result = await api.ai.generateReport({
+        granularity: granularity.value,
+        dateRange: range,
+        tasks: tasksText,
+        reviewContent: reviewText,
+        stats: statsText
+      })
+      content.value = result.content
+      generatedAt.value = new Date().toLocaleString('zh-CN')
+      return
     }
-    const result = await api.ai.generateReport({
-      granularity: granularity.value,
-      dateRange: range,
-      tasks: tasksText,
-      reviewContent: reviewText,
-      stats: tasksText
-    })
-    content.value = result.content
-    generatedAt.value = new Date().toLocaleString('zh-CN')
   } catch (e: unknown) {
     error.value = (e as Error).message || '生成失败'
   } finally {
