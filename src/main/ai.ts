@@ -1,4 +1,4 @@
-import { getSetting, DEEPSEEK_API_KEY } from './db/settings'
+import { getSetting, DEEPSEEK_API_KEY, REPORTER_NAME } from './db/settings'
 
 interface GenerateInput {
   granularity: string
@@ -18,6 +18,7 @@ const WORD_LIMITS: Record<string, string> = {
 }
 
 function buildPrompt(input: GenerateInput): string {
+  const reporter = getSetting(REPORTER_NAME) || ''
   const label = { daily: '日报', weekly: '周报', monthly: '月报', quarterly: '季报', annual: '年报' }[input.granularity]
   if (input.granularity === 'weekly') {
     return `你是一个个人效率助手，请根据以下数据生成一份周报。
@@ -40,7 +41,7 @@ ${input.stats || '无统计数据'}
 请严格按以下 Markdown 格式输出周报：
 
 # 周报 - ${input.dateRange.start} ~ ${input.dateRange.end}
-**汇报人：** 冯可成
+**汇报人：** ${reporter}
 
 ## 一、本周进展
 
@@ -91,7 +92,7 @@ ${input.stats || '无统计数据'}
 请严格按以下 Markdown 格式输出日报：
 
 # 日报 - ${input.dateRange.start}
-**汇报人：** 冯可成
+**汇报人：** ${reporter}
 
 ## 一、今日进展
 
@@ -124,16 +125,32 @@ ${input.tasks || '无任务数据'}
 【复盘总结】
 ${input.reviewContent || '无复盘内容'}
 
+【任务反馈】（完成每个任务时填写的问题和优化建议）
+${input.feedback || '无反馈数据'}
+
 【统计数据】
 ${input.stats || '无统计数据'}
 
-请以 Markdown 格式输出，包含：
-- 总体概述
-- 关键成果/亮点
-- 待改进之处
-- 下一步计划
+请严格按以下 Markdown 格式输出${label}：
 
-要求简洁有力，用数据和事实说话。`
+# ${label} - ${input.dateRange.start} ~ ${input.dateRange.end}
+**汇报人：** ${reporter}
+
+## 一、总体概述
+（根据任务完成情况概述本周期进展）
+
+## 二、关键成果/亮点
+- （列出主要完成的事项和成果）
+
+## 三、待改进之处
+- （根据任务反馈和完成任务中存在的问题提炼）
+
+## 四、下一步计划
+- （合理推断下一周期应推进的事项）
+
+要求：
+- 简洁有力，用数据和事实说话
+- 如果用到的数据不足，相关部分可以简写`
 }
 
 export async function generateReport(input: GenerateInput): Promise<string> {
