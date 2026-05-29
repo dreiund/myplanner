@@ -10,6 +10,12 @@
             show-password-on="click"
           />
         </n-form-item>
+        <n-form-item label="汇报人名称">
+          <n-input
+            v-model:value="reporterName"
+            :placeholder="reporterName || '输入你的名字'"
+          />
+        </n-form-item>
       </n-form>
       <p style="color:#888;font-size:12px;margin-top:4px">
         状态：{{ statusText }}
@@ -37,6 +43,7 @@ watch(showModal, (val) => {
   if (!val) emit('close')
 })
 const apiKey = ref('')
+const reporterName = ref('')
 const hasKey = ref(false)
 const saving = ref(false)
 const testing = ref(false)
@@ -46,6 +53,7 @@ onMounted(async () => {
   try {
     hasKey.value = await api.settings.hasApiKey()
     statusText.value = hasKey.value ? '已配置' : '未配置'
+    reporterName.value = (await api.settings.get('reporter_name')) || ''
   } catch {
     statusText.value = '加载失败'
   }
@@ -58,6 +66,9 @@ async function handleSave() {
     await api.settings.set('deepseek_api_key', apiKey.value.trim())
     hasKey.value = true
     statusText.value = '已配置'
+    if (reporterName.value.trim()) {
+      await api.settings.set('reporter_name', reporterName.value.trim())
+    }
   } catch {
     statusText.value = '保存失败'
   } finally {
