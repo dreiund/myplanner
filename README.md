@@ -191,8 +191,8 @@ npm run build:pkg
 ### tag 发布 Release
 
 ```bash
-git tag v1.1.2
-git push origin v1.1.2
+git tag v1.2.1
+git push origin v1.2.1
 ```
 
 推送 `v*` 格式的 tag 后，GitHub Actions 会在 macOS、Windows、Linux 三个平台分别构建，并创建 GitHub Release。
