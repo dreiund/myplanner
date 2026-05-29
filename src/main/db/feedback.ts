@@ -25,9 +25,9 @@ export function getFeedbackByDate(date: string): FeedbackRow[] {
   return getDb().prepare(`
     SELECT tf.* FROM task_feedback tf
     JOIN tasks t ON t.id = tf.task_id
-    WHERE t.planned_date = ? AND t.status = 'done'
+    WHERE t.planned_date LIKE ? AND t.status = 'done'
     ORDER BY tf.created_at DESC
-  `).all(date) as FeedbackRow[]
+  `).all(`${date}%`) as FeedbackRow[]
 }
 
 export interface FeedbackWithTaskRow extends FeedbackRow {

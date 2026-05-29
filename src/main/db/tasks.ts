@@ -18,7 +18,7 @@ export interface TaskRow {
 
 export function getTasksByDate(date: string): TaskRow[] {
   const db = getDb()
-  return db.prepare('SELECT * FROM tasks WHERE planned_date = ? ORDER BY priority DESC, created_at ASC').all(date) as TaskRow[]
+  return db.prepare('SELECT * FROM tasks WHERE planned_date LIKE ? ORDER BY priority DESC, created_at ASC').all(`${date}%`) as TaskRow[]
 }
 
 export function getTasksByMonth(year: number, month: number): TaskRow[] {

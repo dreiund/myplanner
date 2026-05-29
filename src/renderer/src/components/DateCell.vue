@@ -12,7 +12,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { formatDate, today as todayStr } from '../utils/date'
+import { formatDate, extractDate, today as todayStr } from '../utils/date'
 
 const props = defineProps<{ day: Date | null; tasks: { planned_date: string; status: string; priority: string }[]; selectedDate: string }>()
 defineEmits<{ select: []; dblclick: [] }>()
@@ -23,7 +23,7 @@ const isToday = computed(() => props.day ? formatDate(props.day) === todayStr() 
 const dotColor = computed(() => {
   if (!props.day) return null
   const date = formatDate(props.day)
-  const dayTasks = props.tasks.filter(t => t.planned_date === date)
+  const dayTasks = props.tasks.filter(t => extractDate(t.planned_date) === date)
   if (dayTasks.length === 0) return null
   const allDone = dayTasks.every(t => t.status === 'done')
   if (allDone) return '#18a058'

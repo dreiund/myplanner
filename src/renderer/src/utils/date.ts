@@ -5,6 +5,31 @@ export function formatDate(date: Date): string {
   return `${y}-${m}-${d}`
 }
 
+export function formatDateTime(date: Date): string {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  const h = String(date.getHours()).padStart(2, '0')
+  const min = String(date.getMinutes()).padStart(2, '0')
+  return `${y}-${m}-${d} ${h}:${min}`
+}
+
+export function extractDate(datetime: string): string {
+  return datetime.length >= 10 ? datetime.substring(0, 10) : datetime
+}
+
+export function formatDisplayDateTime(dt: string | null): string {
+  if (!dt) return ''
+  if (dt.length <= 10) {
+    const parts = dt.split('-')
+    if (parts.length < 3) return dt
+    return `${parseInt(parts[1])}/${parseInt(parts[2])}`
+  }
+  const [datePart, timePart] = dt.split(' ')
+  const parts = datePart.split('-')
+  return `${parseInt(parts[1])}/${parseInt(parts[2])} ${timePart}`
+}
+
 export function today(): string {
   return formatDate(new Date())
 }

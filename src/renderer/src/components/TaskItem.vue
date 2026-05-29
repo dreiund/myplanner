@@ -11,7 +11,7 @@
     </div>
     <div class="task-meta">
       <span>{{ estimatedStr }}</span>
-      <span v-if="task.due_date"> · 截止 {{ task.due_date }}</span>
+      <span v-if="task.due_date"> · 截止 {{ formatDisplayDateTime(task.due_date) }}</span>
     </div>
     <div v-if="subtasks.length" class="subtasks">
       <div v-for="s in subtasks" :key="s.id" class="subtask-row">
@@ -31,6 +31,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Task, Subtask } from '../types'
+import { formatDisplayDateTime } from '../utils/date'
 
 const props = defineProps<{ task: Task; subtasks: Subtask[] }>()
 defineEmits<{ toggle: []; edit: []; delete: []; toggleSub: [sid: number] }>()

@@ -66,9 +66,10 @@ export function registerIpcHandlers(): void {
     const tasks = taskDb.getTasksByDateRange(startDate, endDate)
     const byDate = new Map<string, taskDb.TaskRow[]>()
     for (const t of tasks) {
-      const arr = byDate.get(t.planned_date) || []
+      const dateKey = t.planned_date.substring(0, 10)
+      const arr = byDate.get(dateKey) || []
       arr.push(t)
-      byDate.set(t.planned_date, arr)
+      byDate.set(dateKey, arr)
     }
     const days: Record<string, unknown>[] = []
     const allTasks: taskDb.TaskRow[] = []
@@ -125,9 +126,10 @@ export function registerIpcHandlers(): void {
     // Daily breakdown for trend chart
     const byDate = new Map<string, taskDb.TaskRow[]>()
     for (const t of tasks) {
-      const arr = byDate.get(t.planned_date) || []
+      const dateKey = t.planned_date.substring(0, 10)
+      const arr = byDate.get(dateKey) || []
       arr.push(t)
-      byDate.set(t.planned_date, arr)
+      byDate.set(dateKey, arr)
     }
     const days: Record<string, unknown>[] = []
     byDate.forEach((dayTasks, date) => {

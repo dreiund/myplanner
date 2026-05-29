@@ -5,8 +5,8 @@
         <n-form-item label="标题" required>
           <n-input v-model:value="form.title" placeholder="输入任务标题" />
         </n-form-item>
-        <n-form-item label="日期">
-          <n-date-picker v-model:formatted-value="form.planned_date" type="date" />
+        <n-form-item label="开始时间">
+          <n-date-picker v-model:formatted-value="form.planned_date" type="datetime" format="yyyy-MM-dd HH:mm" value-format="yyyy-MM-dd HH:mm" />
         </n-form-item>
         <n-form-item label="优先级">
           <n-select v-model:value="form.priority" :options="priorityOptions" />
@@ -17,8 +17,8 @@
         <n-form-item label="预估耗时">
           <n-input-number v-model:value="form.estimated_min" placeholder="分钟" :min="0" />
         </n-form-item>
-        <n-form-item label="截止日期">
-          <n-date-picker v-model:formatted-value="form.due_date" type="date" />
+        <n-form-item label="截止时间">
+          <n-date-picker v-model:formatted-value="form.due_date" type="datetime" format="yyyy-MM-dd HH:mm" value-format="yyyy-MM-dd HH:mm" />
         </n-form-item>
         <n-form-item label="备注">
           <n-input v-model:value="form.note" type="textarea" placeholder="备注" />
@@ -38,19 +38,26 @@
 import { reactive, computed } from 'vue'
 import { NModal, NCard, NForm, NFormItem, NInput, NInputNumber, NDatePicker, NSelect, NSpace, NButton } from 'naive-ui'
 import type { Task } from '../types'
+import { extractDate } from '../utils/date'
 
 const props = defineProps<{ date: string; task?: Task | null }>()
 const emit = defineEmits<{ close: []; save: [data: Record<string, unknown>] }>()
 
 const isEdit = computed(() => !!props.task)
 
+/** Ensure datetime string has time part; old date-only format → append 00:00 */
+function ensureTime(val: string | null): string | null {
+  if (!val) return val
+  return val.length <= 10 ? `${extractDate(val)} 00:00` : val
+}
+
 const form = reactive({
   title: props.task?.title || '',
-  planned_date: props.task?.planned_date || props.date,
+  planned_date: ensureTime(props.task?.planned_date || props.date),
   priority: props.task?.priority || 'medium',
   category: props.task?.category || 'work',
   estimated_min: props.task?.estimated_min ?? null as number | null,
-  due_date: props.task?.due_date ?? null as string | null,
+  due_date: ensureTime(props.task?.due_date ?? null),
   note: props.task?.note || ''
 })
 
