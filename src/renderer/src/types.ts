@@ -108,6 +108,7 @@ export interface ElectronAPI {
     getMonthly: (year: number, month: number) => Promise<MonthlyStats>
   }
   settings: {
+    get: (key: string) => Promise<string>
     hasApiKey: () => Promise<boolean>
     set: (key: string, value: string) => Promise<void>
   }

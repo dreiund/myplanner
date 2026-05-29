@@ -1,6 +1,7 @@
 import { getDb } from '../database'
 
 export const DEEPSEEK_API_KEY = 'deepseek_api_key'
+export const REPORTER_NAME = 'reporter_name'
 
 export function getSetting(key: string): string | null {
   const row = getDb().prepare('SELECT value FROM settings WHERE key = ?').get(key) as { value: string } | undefined

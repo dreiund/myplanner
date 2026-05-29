@@ -42,6 +42,7 @@ export function registerIpcHandlers(): void {
   // Settings
   ipcMain.handle('settings:hasApiKey', () => settingsDb.hasApiKey())
   ipcMain.handle('settings:set', (_e, key: string, value: string) => settingsDb.setSetting(key, value))
+  ipcMain.handle('settings:get', (_e, key: string) => settingsDb.getSetting(key))
 
   // AI
   ipcMain.handle('ai:generateReport', async (_e, input: Parameters<typeof ai.generateReport>[0]) => {
