@@ -91,11 +91,11 @@ function handleToggle(task: Task) {
   }
 }
 
-async function handleFeedbackSubmit(data: { problems: string; optimizations: string }) {
+async function handleFeedbackSubmit(data: { problems: string; optimizations: string; actualMin?: number }) {
   if (!completingTask.value) return
   const taskId = completingTask.value.id
   await api.feedback.save(taskId, data.problems, data.optimizations)
-  await taskStore.toggleComplete(taskId)
+  await taskStore.toggleComplete(taskId, data.actualMin)
   taskStore.fetchByMonth(cal.currentYear, cal.currentMonth)
   showFeedback.value = false
   completingTask.value = null

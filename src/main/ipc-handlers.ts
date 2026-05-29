@@ -17,7 +17,7 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('tasks:create', (_e, data) => taskDb.createTask(data))
   ipcMain.handle('tasks:update', (_e, id: number, data) => taskDb.updateTask(id, data))
   ipcMain.handle('tasks:remove', (_e, id: number) => taskDb.removeTask(id))
-  ipcMain.handle('tasks:toggleComplete', (_e, id: number) => taskDb.toggleTaskComplete(id))
+  ipcMain.handle('tasks:toggleComplete', (_e, id: number, actualMin?: number) => taskDb.toggleTaskComplete(id, actualMin))
 
   // Subtasks
   ipcMain.handle('subtasks:getByTask', (_e, taskId: number) => subtaskDb.getSubtasksByTask(taskId))

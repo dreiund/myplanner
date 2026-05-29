@@ -27,6 +27,16 @@
         <span class="field-counter">{{ optimizations.length }}/500</span>
       </div>
 
+      <div class="field-group">
+        <label class="field-label">实际耗时（分钟）</label>
+        <n-input-number
+          v-model:value="actualMin"
+          :min="0"
+          :placeholder="task?.estimated_min ? `预估 ${task.estimated_min}min` : '实际花费时间'"
+          class="field-input-number"
+        />
+      </div>
+
       <div class="dialog-actions">
         <button class="cancel-btn" @click="$emit('cancel')">取消</button>
         <button class="confirm-btn" :disabled="!canSubmit" @click="handleSubmit">
@@ -39,7 +49,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
-import { NModal } from 'naive-ui'
+import { NModal, NInputNumber } from 'naive-ui'
 import type { Task } from '../types'
 
 const props = defineProps<{
@@ -48,25 +58,31 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  submit: [data: { problems: string; optimizations: string }]
+  submit: [data: { problems: string; optimizations: string; actualMin?: number }]
   cancel: []
 }>()
 
 const problems = ref('')
 const optimizations = ref('')
+const actualMin = ref<number | null>(null)
 const problemsRef = ref<HTMLTextAreaElement | null>(null)
 
 const canSubmit = computed(() => problems.value.trim().length > 0 && optimizations.value.trim().length > 0)
 
 function handleSubmit() {
   if (!canSubmit.value) return
-  emit('submit', { problems: problems.value.trim(), optimizations: optimizations.value.trim() })
+  emit('submit', {
+    problems: problems.value.trim(),
+    optimizations: optimizations.value.trim(),
+    actualMin: actualMin.value ?? undefined
+  })
 }
 
 watch(() => props.visible, async (v) => {
   if (v) {
     problems.value = ''
     optimizations.value = ''
+    actualMin.value = null
     await nextTick()
     problemsRef.value?.focus()
   }
@@ -183,5 +199,9 @@ watch(() => props.visible, async (v) => {
 .confirm-btn:disabled {
   opacity: 0.35;
   cursor: not-allowed;
+}
+
+.field-input-number {
+  width: 100%;
 }
 </style>

@@ -8,7 +8,7 @@ const electronAPI = {
     create: (task: Record<string, unknown>) => ipcRenderer.invoke('tasks:create', task),
     update: (id: number, data: Record<string, unknown>) => ipcRenderer.invoke('tasks:update', id, data),
     remove: (id: number) => ipcRenderer.invoke('tasks:remove', id),
-    toggleComplete: (id: number) => ipcRenderer.invoke('tasks:toggleComplete', id)
+    toggleComplete: (id: number, actualMin?: number) => ipcRenderer.invoke('tasks:toggleComplete', id, actualMin)
   },
   subtasks: {
     getByTask: (taskId: number) => ipcRenderer.invoke('subtasks:getByTask', taskId),

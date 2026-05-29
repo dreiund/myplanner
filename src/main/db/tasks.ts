@@ -71,14 +71,18 @@ export function removeTask(id: number): void {
   db.prepare('DELETE FROM tasks WHERE id = ?').run(id)
 }
 
-export function toggleTaskComplete(id: number): TaskRow {
+export function toggleTaskComplete(id: number, actualMin?: number): TaskRow {
   const db = getDb()
   const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(id) as TaskRow | undefined
   if (!task) throw new Error(`Task ${id} not found`)
   if (task.status === 'done') {
     db.prepare("UPDATE tasks SET status = 'pending', completed_at = NULL, updated_at = datetime('now','localtime') WHERE id = ?").run(id)
   } else {
-    db.prepare("UPDATE tasks SET status = 'done', completed_at = datetime('now','localtime'), updated_at = datetime('now','localtime') WHERE id = ?").run(id)
+    if (actualMin !== undefined) {
+      db.prepare("UPDATE tasks SET status = 'done', completed_at = datetime('now','localtime'), actual_min = @actual_min, updated_at = datetime('now','localtime') WHERE id = @id").run({ id, actual_min: actualMin })
+    } else {
+      db.prepare("UPDATE tasks SET status = 'done', completed_at = datetime('now','localtime'), updated_at = datetime('now','localtime') WHERE id = ?").run(id)
+    }
   }
   return db.prepare('SELECT * FROM tasks WHERE id = ?').get(id) as TaskRow
 }

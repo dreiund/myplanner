@@ -89,7 +89,7 @@ export interface ElectronAPI {
     create: (data: Partial<Task>) => Promise<Task>
     update: (id: number, data: Partial<Task>) => Promise<Task>
     remove: (id: number) => Promise<void>
-    toggleComplete: (id: number) => Promise<Task>
+    toggleComplete: (id: number, actualMin?: number) => Promise<Task>
   }
   subtasks: {
     getByTask: (taskId: number) => Promise<Subtask[]>

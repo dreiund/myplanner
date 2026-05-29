@@ -29,8 +29,8 @@ export const useTaskStore = defineStore('tasks', () => {
     return task
   }
 
-  async function toggleComplete(id: number) {
-    const task = await api.tasks.toggleComplete(id)
+  async function toggleComplete(id: number, actualMin?: number) {
+    const task = await api.tasks.toggleComplete(id, actualMin)
     const idx = tasksForDate.value.findIndex(t => t.id === id)
     if (idx >= 0) tasksForDate.value[idx] = task
     return task
