@@ -60,12 +60,14 @@ onMounted(async () => {
 })
 
 async function handleSave() {
-  if (!apiKey.value.trim()) return
+  if (!apiKey.value.trim() && !reporterName.value.trim()) return
   saving.value = true
   try {
-    await api.settings.set('deepseek_api_key', apiKey.value.trim())
-    hasKey.value = true
-    statusText.value = '已配置'
+    if (apiKey.value.trim()) {
+      await api.settings.set('deepseek_api_key', apiKey.value.trim())
+      hasKey.value = true
+      statusText.value = '已配置'
+    }
     if (reporterName.value.trim()) {
       await api.settings.set('reporter_name', reporterName.value.trim())
     }
