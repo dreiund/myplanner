@@ -71,6 +71,7 @@ async function handleSave() {
     if (reporterName.value.trim()) {
       await api.settings.set('reporter_name', reporterName.value.trim())
     }
+    statusText.value = hasKey.value ? '已配置' : '名称已保存'
   } catch {
     statusText.value = '保存失败'
   } finally {

@@ -204,7 +204,9 @@ async function generate() {
         return `- ${date}: 任务数 ${dayTasks.length} 个 | 完成率 ${dayRate}%`
       }).join('\n')
       const catStats = raw.byCategory
-      const statsText = `${perDayStats}\n\n本周汇总（仅工作类任务）:\n- 任务总数: ${workTasks.length} 个\n- 已完成: ${doneCount} 个\n- 完成率: ${doneRate}%\n- 预估耗时: ${raw.totalEstimated}min\n- 实际耗时: ${raw.totalActual}min\n\n按分类耗时:\n- 工作：${formatMinutes(catStats.work || 0)}\n- 学习：${formatMinutes(catStats.study || 0)}\n- 生活：${formatMinutes(catStats.life || 0)}`
+      const wkTotalEstimated = workTasks.reduce((s, t) => s + (t.estimated_min || 0), 0)
+      const wkTotalActual = workTasks.reduce((s, t) => s + (t.actual_min || 0), 0)
+      const statsText = `${perDayStats}\n\n本周汇总（仅工作类任务）:\n- 任务总数: ${workTasks.length} 个\n- 已完成: ${doneCount} 个\n- 完成率: ${doneRate}%\n- 预估耗时: ${wkTotalEstimated}min\n- 实际耗时: ${wkTotalActual}min\n\n按分类耗时:\n- 工作：${formatMinutes(catStats.work || 0)}\n- 学习：${formatMinutes(catStats.study || 0)}\n- 生活：${formatMinutes(catStats.life || 0)}`
 
       const result = await api.ai.generateReport({
         granularity: granularity.value,
@@ -246,12 +248,18 @@ async function generate() {
       const reviews = await api.reviews.getByDateRange(range.start, range.end)
       reviewText = reviews.filter(r => r.content).map(r => `### ${r.date}\n${r.content}`).join('\n\n')
 
+      const fbList = await api.feedback.getByDateRange(range.start, range.end)
+      const fbText = fbList.map(f =>
+        `- [${f.planned_date}] 任务「${f.task_title}」: 问题：${f.problems || '无'} / 优化：${f.optimizations || '无'}`
+      ).join('\n')
+
       const result = await api.ai.generateReport({
         granularity: granularity.value,
         dateRange: range,
         tasks: tasksText,
         reviewContent: reviewText,
-        stats: statsText
+        stats: statsText,
+        feedback: fbText
       })
       content.value = result.content
       generatedAt.value = new Date().toLocaleString('zh-CN')
@@ -272,12 +280,21 @@ async function generate() {
       tasksText = `工作类任务总计: ${workTasks.length} 个, 完成 ${workDone} 个, 完成率 ${workRate}%`
       const statsText = `工作类任务总计: ${workTasks.length} 个, 完成 ${workDone} 个, 完成率 ${workRate}%\n\n各分类完成数:\n- 工作：${cat.work} 个\n- 学习：${cat.study} 个\n- 生活：${cat.life} 个`
 
+      const reviews = await api.reviews.getByDateRange(range.start, range.end)
+      reviewText = reviews.filter(r => r.content).map(r => `### ${r.date}\n${r.content}`).join('\n\n')
+
+      const fbList = await api.feedback.getByDateRange(range.start, range.end)
+      const fbText = fbList.map(f =>
+        `- [${f.planned_date}] 任务「${f.task_title}」: 问题：${f.problems || '无'} / 优化：${f.optimizations || '无'}`
+      ).join('\n')
+
       const result = await api.ai.generateReport({
         granularity: granularity.value,
         dateRange: range,
         tasks: tasksText,
         reviewContent: reviewText,
-        stats: statsText
+        stats: statsText,
+        feedback: fbText
       })
       content.value = result.content
       generatedAt.value = new Date().toLocaleString('zh-CN')

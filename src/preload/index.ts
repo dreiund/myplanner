@@ -27,6 +27,7 @@ const electronAPI = {
     getMonthly: (year: number, month: number) => ipcRenderer.invoke('stats:getMonthly', year, month)
   },
   settings: {
+    get: (key: string) => ipcRenderer.invoke('settings:get', key),
     hasApiKey: () => ipcRenderer.invoke('settings:hasApiKey'),
     set: (key: string, value: string) => ipcRenderer.invoke('settings:set', key, value)
   },
